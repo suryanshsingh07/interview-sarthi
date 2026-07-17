@@ -247,7 +247,7 @@ function CustomizePanel({ style, setStyle }) {
 
           {/* Font Family */}
           <div>
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 block flex items-center gap-1"><Type size={12} /> Font Family</label>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1"><Type size={12} /> Font Family</label>
             <div className="flex flex-wrap gap-1.5">
               {FONT_FAMILIES.map(f => (
                 <button
