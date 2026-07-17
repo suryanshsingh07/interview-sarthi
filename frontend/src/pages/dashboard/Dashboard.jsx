@@ -112,7 +112,7 @@ export default function Dashboard() {
             )) : (
               <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-center p-6">
                 <Target size={40} className="mb-4 opacity-20" />
-                <p>No recent interviews.</p>
+                <p>No recent interviews</p>
                 <Link to="/dashboard/setup" className="text-primary mt-2 font-medium">Start one now</Link>
               </div>
             )}

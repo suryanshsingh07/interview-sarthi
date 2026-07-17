@@ -12,9 +12,11 @@ const getGeminiClient = () => {
   return genAI;
 };
 
-const getModel = (modelName = 'gemini-2.0-flash') => {
+const getModel = (modelName = 'gemini-1.5-flash', systemInstruction = undefined) => {
   const client = getGeminiClient();
-  return client.getGenerativeModel({ model: modelName });
+  const config = { model: modelName };
+  if (systemInstruction) config.systemInstruction = systemInstruction;
+  return client.getGenerativeModel(config);
 };
 
 module.exports = { getGeminiClient, getModel };

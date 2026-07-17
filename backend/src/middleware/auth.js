@@ -13,6 +13,12 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    if (decoded.role === 'admin') {
+      req.user = { _id: 'admin_id', name: 'Super Admin', email: process.env.ADMIN_EMAIL, role: 'admin', isActive: true };
+      return next();
+    }
+
     const user = await User.findById(decoded.id);
 
     if (!user || !user.isActive) {
@@ -36,8 +42,8 @@ const adminOnly = (req, res, next) => {
   next();
 };
 
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const generateToken = (userId, role = 'user') => {
+  return jwt.sign({ id: userId, role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };

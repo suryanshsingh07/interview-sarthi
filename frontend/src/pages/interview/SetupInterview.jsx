@@ -1,199 +1,162 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import api from '../../lib/api';
-import { Loader2, Settings2, Sparkles, Upload } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Mic, ChevronRight, Sparkles, CheckCircle, RefreshCw } from 'lucide-react';
+import useAuthStore from '../../store/authStore';
+
+const JOB_ROLES = [
+  { id: 'Software Developer', icon: '💻', desc: 'DSA, system design & HR' },
+  { id: 'Frontend Developer', icon: '🎨', desc: 'React, CSS, JS fundamentals' },
+  { id: 'Backend Developer', icon: '⚙️', desc: 'APIs, DBs & scalability' },
+  { id: 'Data Analyst', icon: '📊', desc: 'SQL, tools & communication' },
+  { id: 'Business Analyst', icon: '📋', desc: 'Requirements & processes' },
+  { id: 'DevOps Engineer', icon: '🔧', desc: 'CI/CD, Docker, cloud infra' },
+  { id: 'Customer Support', icon: '🎧', desc: 'Communication & empathy' },
+  { id: 'HR Executive', icon: '🤝', desc: 'People & conflict resolution' },
+];
+
+const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
+const EXPERIENCES = ['Fresher', '1 Year', '2-3 Years', '5+ Years'];
 
 export default function SetupInterview() {
+  const { user } = useAuthStore();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [languages, setLanguages] = useState([]);
-  const [resumeData, setResumeData] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [role, setRole] = useState('');
+  const [difficulty, setDifficulty] = useState('Medium');
+  const [experience, setExperience] = useState('Fresher');
 
-  const { register, handleSubmit, watch, setValue } = useForm({
-    defaultValues: {
-      type: 'Technical',
-      difficulty: 'Medium',
-      experience: 'Fresher',
-      jobRole: 'Frontend Developer',
-      company: 'General',
-      language: 'English',
-      duration: 20
-    }
-  });
+  const canStart = !!role;
 
-  const selectedType = watch('type');
-
-  useEffect(() => {
-    const fetchLanguages = async () => {
-      try {
-        const { data } = await api.get('/ai/languages');
-        setLanguages(data.data.languages || []);
-      } catch (e) {
-        console.error('Failed to load languages');
-      }
-    };
-    fetchLanguages();
-  }, []);
-
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('resume', file);
-
-    try {
-      setIsUploading(true);
-      const { data } = await api.post('/upload/resume', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setResumeData(data.data);
-      // Try to auto-detect role from resume later, for now just show success
-    } catch (error) {
-      console.error('Upload failed', error);
-      alert('Failed to upload resume. Please try again.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const onSubmit = async (data) => {
-    try {
-      setIsLoading(true);
-      const payload = { ...data, resumeData: resumeData ? { text: resumeData.text } : null };
-      const response = await api.post('/interviews', payload);
-      navigate(`/interview/${response.data.data.interview._id}`);
-    } catch (error) {
-      console.error('Failed to create interview', error);
-      alert('Failed to start interview. Please check your connection.');
-      setIsLoading(false);
-    }
+  const handleStart = () => {
+    if (!canStart) return;
+    const resumeText = document.getElementById('resume-input')?.value || '';
+    const config = { role, difficulty, experience, resumeText };
+    sessionStorage.setItem('interviewConfig', JSON.stringify(config));
+    navigate('/interview/session');
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto pt-2 pb-10 px-2">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-4"
+          style={{ background: 'hsl(var(--primary)/0.1)', color: 'hsl(var(--primary))' }}>
+          <Sparkles className="h-3.5 w-3.5" /> AI-Powered Mock Interview • Questions Shuffled Every Time
+        </div>
+        <h1 className="text-3xl font-display font-bold mb-2">Ready for Your Interview?</h1>
+        <p className="text-muted-foreground">Select your target role and our AI interviewer will ask you personalized questions with instant feedback.</p>
+      </motion.div>
+
+      {/* Role Selection */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          <Settings2 className="text-primary" /> Customize Your Interview
-        </h1>
-        <p className="text-muted-foreground text-lg">Tailor the AI to simulate your exact target interview scenario.</p>
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-4">1. Select Your Role</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {JOB_ROLES.map((r, i) => (
+            <motion.button
+              key={r.id}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              onClick={() => setRole(r.id)}
+              className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 ${
+                role === r.id ? 'border-primary bg-primary/5 shadow-purple' : 'border-border glass-card hover:border-primary/40'
+              }`}
+            >
+              <div className="text-2xl mb-2">{r.icon}</div>
+              <div className="font-semibold text-sm mb-1">{r.id}</div>
+              <div className="text-xs text-muted-foreground">{r.desc}</div>
+              {role === r.id && (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="mt-2">
+                  <CheckCircle className="h-4 w-4 text-primary" />
+                </motion.div>
+              )}
+            </motion.button>
+          ))}
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-6">
-          <form id="setup-form" onSubmit={handleSubmit(onSubmit)} className="glass-card p-8 rounded-3xl space-y-6 border border-border">
-            
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="font-semibold text-sm ml-1">Job Role</label>
-                <input 
-                  {...register('jobRole')}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                  placeholder="e.g. React Developer"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-semibold text-sm ml-1">Company (Optional)</label>
-                <input 
-                  {...register('company')}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                  placeholder="e.g. Google, TCS"
-                />
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="font-semibold text-sm ml-1">Interview Type</label>
-                <select {...register('type')} className="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none cursor-pointer">
-                  <option value="Technical">Technical</option>
-                  <option value="HR">HR / Behavioral</option>
-                  <option value="Mixed">Mixed</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-semibold text-sm ml-1">Difficulty</label>
-                <select {...register('difficulty')} className="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none cursor-pointer">
-                  <option value="Easy">Easy</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Hard">Hard</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="font-semibold text-sm ml-1">Your Experience Level</label>
-                <select {...register('experience')} className="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none cursor-pointer">
-                  <option value="Fresher">Fresher</option>
-                  <option value="1 Year">1 Year</option>
-                  <option value="2 Years">2 Years</option>
-                  <option value="5 Years">5 Years</option>
-                  <option value="10+ Years">10+ Years</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-semibold text-sm ml-1">Interview Language</label>
-                <select {...register('language')} className="w-full bg-background border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none cursor-pointer">
-                  <option value="English">English</option>
-                  {languages.filter(l => l.name !== 'English').map(lang => (
-                    <option key={lang.code} value={lang.name}>{lang.name} ({lang.nativeName})</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-          </form>
-        </div>
-
-        <div className="space-y-6">
-          <div className="glass-card p-6 rounded-3xl border border-border">
-            <h3 className="font-bold mb-4 flex items-center gap-2"><Upload size={18} className="text-primary"/> Resume Tailoring</h3>
-            <p className="text-sm text-muted-foreground mb-4">Upload your resume to get personalized questions based on your specific projects and skills.</p>
-            
-            <div className="relative">
-              <input 
-                type="file" 
-                onChange={handleFileUpload} 
-                accept=".pdf,.doc,.docx,.txt"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                disabled={isUploading}
-              />
-              <div className={`border-2 border-dashed ${resumeData ? 'border-green-500 bg-green-500/10' : 'border-border hover:border-primary bg-background'} rounded-2xl p-6 text-center transition-colors`}>
-                {isUploading ? (
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-                ) : resumeData ? (
-                  <div className="text-green-500 font-medium">✓ Resume Uploaded</div>
-                ) : (
-                  <div>
-                    <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                    <span className="text-sm font-medium">Click or drag file here</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card p-6 rounded-3xl border border-primary/30 bg-primary/5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[40px] -z-10"></div>
-            <h3 className="font-bold mb-2 flex items-center gap-2"><Sparkles size={18} className="text-primary"/> Ready to begin?</h3>
-            <p className="text-sm text-muted-foreground mb-6">Make sure you are in a quiet room and your microphone is working.</p>
-            
-            <button 
-              form="setup-form"
-              disabled={isLoading}
-              type="submit"
-              className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isLoading ? <Loader2 className="animate-spin w-6 h-6" /> : 'Start Interview Now'}
-            </button>
+      {/* Config options */}
+      <div className="grid sm:grid-cols-2 gap-6 mb-8">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3">2. Difficulty</h2>
+          <div className="flex flex-col gap-2">
+            {DIFFICULTIES.map(d => (
+              <button
+                key={d}
+                onClick={() => setDifficulty(d)}
+                className={`p-3 rounded-xl border text-sm font-medium text-left transition-all ${
+                  difficulty === d ? 'border-primary bg-primary/5 text-primary' : 'border-border glass-card hover:border-primary/30'
+                }`}
+              >
+                {d === 'Easy' ? '🟢' : d === 'Medium' ? '🟡' : '🔴'} {d}
+              </button>
+            ))}
           </div>
         </div>
+
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3">3. Your Experience</h2>
+          <div className="flex flex-col gap-2">
+            {EXPERIENCES.map(e => (
+              <button
+                key={e}
+                onClick={() => setExperience(e)}
+                className={`p-3 rounded-xl border text-sm font-medium text-left transition-all ${
+                  experience === e ? 'border-primary bg-primary/5 text-primary' : 'border-border glass-card hover:border-primary/30'
+                }`}
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Resume Section */}
+      <div className="mb-8">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
+          4. Resume / CV <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">Optional</span>
+        </h2>
+        <div className="relative">
+          <textarea
+            placeholder="Paste your resume or key experience here. Our AI will generate custom questions tailored to your profile!"
+            className="w-full min-h-[120px] rounded-2xl border border-border glass-card p-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-y"
+            onChange={(e) => {
+              // Store directly to window to avoid re-renders on every keystroke slowing it down, 
+              // or use state. State is fine.
+            }}
+            id="resume-input"
+          ></textarea>
+        </div>
+      </div>
+
+      {/* Start button */}
+      <div className="flex flex-col items-center gap-4">
+        <motion.button
+          whileHover={{ scale: canStart ? 1.02 : 1 }}
+          whileTap={{ scale: canStart ? 0.98 : 1 }}
+          onClick={handleStart}
+          disabled={!canStart}
+          className="flex items-center gap-3 px-10 py-5 rounded-2xl text-base font-bold bg-gradient-hero text-primary-foreground shadow-glow hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <Mic className="h-5 w-5" /> Start Interview <ChevronRight className="h-5 w-5" />
+        </motion.button>
+        {!canStart && <p className="text-xs text-muted-foreground">Select a role to begin</p>}
+      </div>
+
+      {/* Features row */}
+      <div className="grid grid-cols-3 gap-4 mt-10 text-center">
+        {[
+          { icon: '🔀', label: 'Shuffled Questions', desc: 'Different every time' },
+          { icon: '🤖', label: 'AI Feedback', desc: 'Instant improvement tips' },
+          { icon: '📊', label: 'Full Report', desc: 'Detailed score analysis' },
+        ].map(f => (
+          <div key={f.label} className="p-4 rounded-xl glass-card">
+            <div className="text-2xl mb-1">{f.icon}</div>
+            <p className="text-xs font-semibold">{f.label}</p>
+            <p className="text-xs text-muted-foreground">{f.desc}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

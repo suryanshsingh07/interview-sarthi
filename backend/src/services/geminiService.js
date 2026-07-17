@@ -11,11 +11,8 @@ class GeminiService {
     this.model = null;
   }
 
-  getModel() {
-    if (!this.model) {
-      this.model = getModel('gemini-2.0-flash');
-    }
-    return this.model;
+  getModel(systemInstruction = undefined) {
+    return getModel('gemini-1.5-flash', systemInstruction);
   }
 
   /**
@@ -23,7 +20,7 @@ class GeminiService {
    */
   async startInterview(config) {
     const systemPrompt = buildInterviewerSystemPrompt(config);
-    const model = this.getModel();
+    const model = this.getModel(systemPrompt);
 
     const chat = model.startChat({
       history: [],
@@ -32,8 +29,7 @@ class GeminiService {
         topK: 40,
         topP: 0.95,
         maxOutputTokens: 512,
-      },
-      systemInstruction: systemPrompt
+      }
     });
 
     const result = await chat.sendMessage('Please start the interview with a warm greeting and your first question.');
@@ -46,7 +42,7 @@ class GeminiService {
    */
   async continueInterview(config, conversationHistory, userMessage) {
     const systemPrompt = buildInterviewerSystemPrompt(config);
-    const model = this.getModel();
+    const model = this.getModel(systemPrompt);
 
     // Build history for Gemini (only AI messages as model, user messages as user)
     const history = [];
@@ -65,8 +61,7 @@ class GeminiService {
         topK: 40,
         topP: 0.95,
         maxOutputTokens: 512,
-      },
-      systemInstruction: systemPrompt
+      }
     });
 
     const result = await chat.sendMessage(userMessage);
@@ -188,7 +183,7 @@ Return ONLY a valid JSON object:
    */
   async closeInterview(config, conversationHistory) {
     const systemPrompt = buildInterviewerSystemPrompt(config);
-    const model = this.getModel();
+    const model = this.getModel(systemPrompt);
 
     const history = conversationHistory.map(msg => ({
       role: msg.role === 'interviewer' ? 'model' : 'user',
@@ -197,7 +192,6 @@ Return ONLY a valid JSON object:
 
     const chat = model.startChat({
       history,
-      systemInstruction: systemPrompt,
       generationConfig: { temperature: 0.7, maxOutputTokens: 256 }
     });
 

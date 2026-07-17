@@ -139,4 +139,43 @@ const getAdminStats = async (req, res) => {
   }
 };
 
-module.exports = { getReport, getProgress, getDashboardStats, getAdminStats };
+// @desc    Get leaderboard
+// @route   GET /api/progress/leaderboard
+const getLeaderboard = async (req, res) => {
+  try {
+    const progressList = await Progress.find({ completedInterviews: { $gt: 0 } })
+      .populate('user', 'name targetRole avatar')
+      .lean();
+
+    const leaderboard = progressList.map(p => {
+      const points = (p.averageScore * p.completedInterviews * 10) + (p.currentStreak * 100);
+      return {
+        _id: p.user._id,
+        name: p.user.name,
+        targetRole: p.user.targetRole || 'Candidate',
+        avatar: p.user.avatar,
+        score: points,
+        streak: p.currentStreak,
+        avgScore: p.averageScore,
+        interviews: p.completedInterviews
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 50);
+
+    // Add rank
+    leaderboard.forEach((user, index) => {
+      user.rank = index + 1;
+    });
+
+    res.json({
+      success: true,
+      data: leaderboard
+    });
+  } catch (error) {
+    console.error('Leaderboard error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch leaderboard.' });
+  }
+};
+
+module.exports = { getReport, getProgress, getDashboardStats, getAdminStats, getLeaderboard };

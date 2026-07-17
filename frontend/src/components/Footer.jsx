@@ -1,47 +1,66 @@
+import { Link } from 'react-router-dom';
+import { Twitter, Linkedin, Github } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
+
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
-    <footer className="border-t border-border/50 bg-background/50 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          <div className="col-span-1 md:col-span-1">
-            <span className="font-bold text-2xl tracking-tight flex items-center gap-2 mb-4">
-              Interview<span className="text-primary">IQ</span>
-            </span>
-            <p className="text-muted-foreground mb-6">
+    <footer className="py-12 px-4 border-t border-border bg-card/50 mt-auto">
+      <div className="container mx-auto max-w-6xl">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+          <div>
+            <div className="font-display font-bold text-lg mb-4 flex items-center gap-1">
+              Interview <span className="text-gradient">Sarthi</span>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Practice smarter. Interview better. Your AI-powered career coach for the modern tech industry.
             </p>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Product</h3>
-            <ul className="space-y-3 text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Testimonials</a></li>
-            </ul>
+            <h4 className="font-display font-semibold mb-3">Platform</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <Link to="/dashboard/setup" className="block hover:text-foreground transition-colors">Mock Interview</Link>
+              <Link to="/courses" className="block hover:text-foreground transition-colors">Courses</Link>
+              <Link to="/quiz" className="block hover:text-foreground transition-colors">Aptitude Tests</Link>
+              <Link to="/leaderboard" className="block hover:text-foreground transition-colors">Leaderboard</Link>
+            </div>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Resources</h3>
-            <ul className="space-y-3 text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Interview Guides</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Resume Tips</a></li>
-            </ul>
+            <h4 className="font-display font-semibold mb-3">Resources</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <Link to="/blog" className="block hover:text-foreground transition-colors">Blog & Tips</Link>
+              <Link to="/gov-exams" className="block hover:text-foreground transition-colors">Gov. Exams</Link>
+              <span className="block hover:text-foreground transition-colors cursor-pointer">FAQ</span>
+              <span className="block hover:text-foreground transition-colors cursor-pointer">Support</span>
+            </div>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Company</h3>
-            <ul className="space-y-3 text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-            </ul>
+            <h4 className="font-display font-semibold mb-3">Company</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <span className="block hover:text-foreground transition-colors cursor-pointer">About Us</span>
+              <span className="block hover:text-foreground transition-colors cursor-pointer">Careers</span>
+              <span className="block hover:text-foreground transition-colors cursor-pointer">Privacy Policy</span>
+              <span className="block hover:text-foreground transition-colors cursor-pointer">Terms of Service</span>
+            </div>
           </div>
         </div>
-        <div className="border-t border-border/50 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} InterviewIQ AI. All rights reserved.</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-primary transition-colors">Twitter</a>
-            <a href="#" className="hover:text-primary transition-colors">LinkedIn</a>
-            <a href="#" className="hover:text-primary transition-colors">GitHub</a>
+        
+        <div className="border-t border-border pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} Interview Sarthi - All rights reserved
+          </p>
+          
+          <div className="flex items-center gap-5 text-muted-foreground">
+            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors p-2 hover:bg-muted rounded-full">
+              <Twitter size={20} />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors p-2 hover:bg-muted rounded-full">
+              <Linkedin size={20} />
+            </a>
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors p-2 hover:bg-muted rounded-full">
+              <Github size={20} />
+            </a>
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ const reportRoutes = require('./src/routes/report');
 const progressRoutes = require('./src/routes/progress');
 const adminRoutes = require('./src/routes/admin');
 const uploadRoutes = require('./src/routes/upload');
+const contactRoutes = require('./src/routes/contact');
 
 const app = express();
 
@@ -71,6 +72,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/contact', contactRoutes);
 
 // 404 Handler
 app.use('*', (req, res) => {

@@ -1,55 +1,182 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useAuthStore from '../store/authStore';
-import { Bot, User as UserIcon } from 'lucide-react';
+import { Bot, Moon, Sun, Globe, ChevronDown, Menu, X, LogOut } from 'lucide-react';
+import { useTheme } from './ThemeProvider';
+import { useLanguage } from '../i18n/LanguageContext';
+import { useState } from 'react';
 
 export default function Navbar() {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
+  const { theme, setTheme } = useTheme();
+  const { lang, setLang, t, supportedLanguages } = useLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const langCodeMap = {
+    'English': 'en', 'Hindi': 'hi', 'Bengali': 'bn', 'Telugu': 'te', 'Marathi': 'mr', 
+    'Tamil': 'ta', 'Urdu': 'ur', 'Gujarati': 'gu', 'Kannada': 'kn', 'Odia': 'or', 
+    'Malayalam': 'ml', 'Punjabi': 'pa', 'Assamese': 'as', 'Maithili': 'mai', 
+    'Santali': 'sat', 'Kashmiri': 'ks', 'Nepali': 'ne', 'Sindhi': 'sd', 
+    'Dogri': 'doi', 'Konkani': 'gom', 'Manipuri': 'mni', 'Bodo': 'brx', 'Sanskrit': 'sa'
+  };
+
+  const handleLanguageChange = (l) => {
+    setLang(l);
+    setLangOpen(false);
+    setMenuOpen(false);
+    const code = langCodeMap[l] || 'en';
+    const select = document.querySelector('.goog-te-combo');
+    if (select) {
+      select.value = code;
+      select.dispatchEvent(new Event('change'));
+    }
+  };
+
+  const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass border-b border-white/10 transition-all duration-300">
+    <nav className="sticky top-0 w-full z-50 glass border-b border-border/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-primary/10 p-2 rounded-xl group-hover:bg-primary/20 transition-colors">
-              <Bot className="w-8 h-8 text-primary" />
-            </div>
-            <span className="font-bold text-2xl tracking-tight">Interview<span className="text-primary">IQ</span></span>
-          </Link>
-          
-          <div className="hidden md:flex items-center gap-8 font-medium">
-            <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
-            <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">How it Works</a>
-            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-          </div>
+        <div className="flex justify-between items-center h-16">
 
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <Link to="/dashboard" className="flex items-center gap-3 bg-secondary/50 hover:bg-secondary px-4 py-2 rounded-full transition-all border border-border/50">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                  {user?.name?.charAt(0) || <UserIcon size={16} />}
-                </div>
-                <span className="font-medium hidden sm:block">Dashboard</span>
-              </Link>
-            ) : (
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-xl">
+            <div className="w-8 h-8 rounded-lg bg-gradient-hero flex items-center justify-center">
+              <Bot className="w-5 h-5 text-white" />
+            </div>
+            <span className="hidden sm:block">Interview <span className="text-gradient">Sarthi</span></span>
+          </Link>
+
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-5 text-sm font-medium">
+            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">{t('nav.home')}</Link>
+            <Link to="/courses" className="text-muted-foreground hover:text-foreground transition-colors">{t('nav.courses')}</Link>
+            <Link to="/quiz" className="text-muted-foreground hover:text-foreground transition-colors">{t('nav.aptitude')}</Link>
+            <Link to="/blog" className="text-muted-foreground hover:text-foreground transition-colors">{t('nav.blog')}</Link>
+            <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">{t('nav.contact')}</Link>
+            {isAuthenticated && (
               <>
-                <Link to="/login" className="hidden sm:block text-muted-foreground hover:text-foreground font-medium transition-colors">
-                  Log in
-                </Link>
-                <Link to="/register">
-                  <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full font-medium shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
-                  >
-                    Start Free
-                  </motion.button>
-                </Link>
+                <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">{t('nav.dashboard')}</Link>
+                <Link to="/dashboard/setup" className="text-muted-foreground hover:text-foreground transition-colors">{t('nav.practice')}</Link>
               </>
             )}
           </div>
+
+          {/* Right Controls */}
+          <div className="flex items-center gap-2">
+            {/* Language Switcher */}
+            <div className="relative hidden md:block">
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors border border-border/50"
+              >
+                <Globe className="w-4 h-4" />
+                <span>{lang}</span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              {langOpen && (
+                <div className="absolute top-full right-0 mt-2 w-40 max-h-80 overflow-y-auto bg-card border border-border rounded-xl shadow-xl py-1 z-50 custom-scrollbar">
+                  {supportedLanguages.map(l => (
+                    <button
+                      key={l}
+                      onClick={() => handleLanguageChange(l)}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-muted transition-colors ${lang === l ? 'text-primary font-semibold' : 'text-muted-foreground'}`}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-xl bg-muted/50 hover:bg-muted transition-colors border border-border/50"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            {/* Auth */}
+            {isAuthenticated ? (
+              <div className="hidden md:flex items-center gap-2">
+                <Link to="/dashboard" className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors text-sm font-medium text-primary">
+                  <div className="w-6 h-6 rounded-full bg-gradient-hero flex items-center justify-center text-white text-xs font-bold">
+                    {user?.name?.charAt(0) || 'U'}
+                  </div>
+                  <span className="hidden lg:block">{user?.name?.split(' ')[0]}</span>
+                </Link>
+                <button onClick={handleLogout} className="p-2 rounded-xl text-muted-foreground hover:text-destructive transition-colors">
+                  <LogOut size={18} />
+                </button>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-2">
+                <Link to="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2">
+                  Log in
+                </Link>
+                <Link to="/register">
+                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-hero text-white text-sm font-semibold shadow-glow hover:opacity-90 transition-opacity">
+                    {t('nav.getStarted')}
+                  </motion.button>
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile hamburger */}
+            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2">
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+          className="md:hidden glass border-t border-border px-4 py-4 flex flex-col gap-3"
+        >
+          {[
+            { to: '/', label: t('nav.home') },
+            { to: '/courses', label: t('nav.courses') },
+            { to: '/quiz', label: t('nav.aptitude') },
+            { to: '/blog', label: t('nav.blog') },
+            { to: '/contact', label: t('nav.contact') },
+            ...(isAuthenticated ? [
+              { to: '/dashboard', label: t('nav.dashboard') },
+              { to: '/dashboard/setup', label: t('nav.practice') },
+            ] : []),
+          ].map(item => (
+            <Link key={item.to} to={item.to} onClick={() => setMenuOpen(false)} className="text-sm font-medium py-1">{item.label}</Link>
+          ))}
+
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border max-h-48 overflow-y-auto">
+            <Globe className="w-4 h-4 text-muted-foreground" />
+            {supportedLanguages.map(l => (
+              <button key={l} onClick={() => handleLanguageChange(l)}
+                className={`px-2 py-1 rounded text-xs ${lang === l ? 'text-primary font-bold bg-primary/10' : 'text-muted-foreground'}`}>
+                {l}
+              </button>
+            ))}
+          </div>
+
+          {isAuthenticated ? (
+            <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="text-sm font-medium text-destructive flex items-center gap-2">
+              <LogOut size={16} /> {t('nav.signOut')}
+            </button>
+          ) : (
+            <Link to="/register" onClick={() => setMenuOpen(false)}>
+              <button className="w-full py-3 rounded-xl bg-gradient-hero text-white font-semibold text-sm">
+                {t('nav.getStarted')}
+              </button>
+            </Link>
+          )}
+        </motion.div>
+      )}
     </nav>
   );
 }

@@ -40,6 +40,23 @@ const login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
 
+    // Check for Super Admin
+    if (
+      process.env.ADMIN_EMAIL &&
+      process.env.ADMIN_PASSWORD &&
+      email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase() &&
+      password === process.env.ADMIN_PASSWORD
+    ) {
+      const token = generateToken('admin_id', 'admin');
+      const adminUser = {
+        _id: 'admin_id',
+        name: 'Super Admin',
+        email: process.env.ADMIN_EMAIL,
+        role: 'admin',
+      };
+      return res.json({ success: true, message: 'Super Admin login successful!', data: { user: adminUser, token } });
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     if (!user || !user.password) {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
