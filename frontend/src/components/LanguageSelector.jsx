@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Globe } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 export default function LanguageSelector() {
-  const [currentLang, setCurrentLang] = useState('English');
+  const [currentLang, setCurrentLang] = useState(localStorage.getItem('app_lang_name') || 'English');
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -21,22 +23,21 @@ export default function LanguageSelector() {
   ];
 
   useEffect(() => {
-    // Add Google Translate script if not present
-    if (!document.getElementById('google-translate-script')) {
-      const script = document.createElement('script');
-      script.id = 'google-translate-script';
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      document.body.appendChild(script);
-
-      window.googleTranslateElementInit = () => {
-        new window.google.translate.TranslateElement(
-          { pageLanguage: 'en', autoDisplay: false },
-          'google_translate_element'
-        );
-      };
+    // Re-trigger Google Translate on route change if a language other than English is selected
+    const savedLangCode = localStorage.getItem('app_lang_code');
+    if (savedLangCode && savedLangCode !== 'en') {
+      setTimeout(() => {
+        const select = document.querySelector('.goog-te-combo');
+        if (select && select.value !== savedLangCode) {
+          select.value = savedLangCode;
+          select.dispatchEvent(new Event('change'));
+        } else if (select) {
+          // Force re-translation for new DOM elements
+          select.dispatchEvent(new Event('change'));
+        }
+      }, 500); // Small delay to allow React to render new route components
     }
-  }, []);
+  }, [location.pathname]);
 
   const changeLanguage = (langCode, langName) => {
     // Select the google translate dropdown and trigger change
@@ -46,14 +47,15 @@ export default function LanguageSelector() {
       select.dispatchEvent(new Event('change'));
     }
     setCurrentLang(langName);
+    localStorage.setItem('app_lang_name', langName);
+    localStorage.setItem('app_lang_code', langCode);
     setIsOpen(false);
   };
 
   return (
     <div className="relative">
-      <div id="google_translate_element" className="hidden"></div>
-      
-      <button 
+
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-sm font-medium border border-border"
       >

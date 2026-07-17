@@ -55,9 +55,12 @@ export default function Register() {
       {/* Left Brand Panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-hero relative items-center justify-center p-12 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
-        <div className="absolute top-6 left-8 font-display font-bold text-lg text-white">
-          Interview <span className="opacity-80">Sarthi</span>
-        </div>
+        <div className="absolute top-6 left-8 flex items-center gap-2 font-display font-bold text-lg text-white">
+    <img src="/favicon.ico" className="w-8 h-8 object-contain" />
+    <span>
+      Interview <span className="opacity-80">Sarthi</span>
+    </span>
+  </div>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
           className="relative text-center text-white max-w-md">
           <div className="w-32 h-32 mx-auto mb-8 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">

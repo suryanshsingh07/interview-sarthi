@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { Loader2, Target, TrendingUp, Trophy, Flame, Play, Clock } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 
@@ -46,7 +46,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: 'Avg Score', value: `${stats.averageScore || 0}%`, icon: <Target className="text-blue-500" />, color: 'bg-blue-500/10 border-blue-500/20' },
-          { label: 'Interviews', value: stats.completedInterviews || 0, icon: <TrendingUp className="text-green-500" />, color: 'bg-green-500/10 border-green-500/20' },
+          { label: 'Interviews', value: stats.totalInterviews || 0, icon: <TrendingUp className="text-green-500" />, color: 'bg-green-500/10 border-green-500/20' },
           { label: 'Highest Score', value: `${stats.highestScore || 0}%`, icon: <Trophy className="text-yellow-500" />, color: 'bg-yellow-500/10 border-yellow-500/20' },
           { label: 'Current Streak', value: stats.currentStreak || 0, icon: <Flame className="text-orange-500" />, color: 'bg-orange-500/10 border-orange-500/20' },
         ].map((stat, i) => (
@@ -64,21 +64,38 @@ export default function Dashboard() {
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Performance Chart */}
-        <div className="lg:col-span-2 glass-card p-6 rounded-3xl border border-border">
+        <div className="lg:col-span-2 glass-card p-6 rounded-3xl border border-border relative overflow-hidden">
           <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
             <TrendingUp size={20} className="text-primary"/> Performance Overview
           </h3>
-          <div className="h-[300px] w-full">
+          
+          {stats.totalInterviews === 0 && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm rounded-3xl">
+              <div className="bg-card p-4 rounded-xl shadow-lg border border-border text-center max-w-xs">
+                <TrendingUp size={32} className="mx-auto mb-2 text-primary opacity-50" />
+                <h4 className="font-semibold text-foreground mb-1">No Data Yet</h4>
+                <p className="text-xs text-muted-foreground">Start your first interview to unlock your performance analytics.</p>
+              </div>
+            </div>
+          )}
+
+          <div className={`h-[300px] w-full ${stats.totalInterviews === 0 ? 'opacity-30 pointer-events-none grayscale' : ''}`}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weeklyData}>
+              <LineChart data={stats.totalInterviews === 0 ? [
+                { day: 'Mon', avgScore: 30, count: 1 }, { day: 'Tue', avgScore: 45, count: 2 }, { day: 'Wed', avgScore: 40, count: 1 },
+                { day: 'Thu', avgScore: 60, count: 3 }, { day: 'Fri', avgScore: 75, count: 2 }, { day: 'Sat', avgScore: 85, count: 4 }, { day: 'Sun', avgScore: 90, count: 5 }
+              ] : weeklyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} domain={[0, 100]} />
+                <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} domain={[0, 100]} />
+                <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px' }}
                   itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
-                <Line type="monotone" dataKey="avgScore" name="Avg Score" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                <Line yAxisId="left" type="monotone" dataKey="avgScore" name="Avg Score (%)" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <Line yAxisId="right" type="monotone" dataKey="count" name="Interviews Given" stroke="hsl(var(--accent))" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

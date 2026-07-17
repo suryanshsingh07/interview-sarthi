@@ -15,9 +15,7 @@ export default function Navbar() {
           
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">I</span>
-              </div>
+              <img src="/favicon.ico" className="w-8 h-8 object-contain" />
               <span className="font-bold text-xl hidden sm:block">Interview Sarthi</span>
             </Link>
             

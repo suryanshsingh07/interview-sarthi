@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
-import { LayoutDashboard, Target, History, Settings, LogOut, Menu, X, Bell, MessageSquarePlus, Mic, BookOpen, Brain, Trophy, FileText, GraduationCap, MessageCircle, FileEdit, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, Target, History, Settings, LogOut, Menu, X, Bell, MessageSquarePlus, Mic, BookOpen, Brain, Trophy, FileText, GraduationCap, MessageCircle, FileEdit, ShieldAlert, Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FeedbackModal from '../components/FeedbackModal';
 import { useTheme } from '../components/ThemeProvider';
-import { useLanguage } from '../i18n/LanguageContext';
+import LanguageSelector from '../components/LanguageSelector';
 
 export default function DashboardLayout() {
   const { user, logout } = useAuthStore();
-  const { lang, setLang } = useLanguage();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
@@ -54,11 +53,20 @@ export default function DashboardLayout() {
         className={`fixed lg:relative top-0 z-50 h-screen w-72 bg-card border-r border-border flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="h-20 flex items-center justify-between px-6 border-b border-border">
-          <Link to="/" className="font-bold text-xl tracking-tight">Interview <span className="text-primary">Sarthi</span></Link>
-          <button className="lg:hidden text-muted-foreground hover:text-foreground" onClick={() => setSidebarOpen(false)}>
-            <X size={24} />
-          </button>
-        </div>
+  <div className="flex items-center gap-2">
+    <img src="/favicon.ico" className="w-8 h-8 object-contain" />
+    <Link to="/" className="font-bold text-xl tracking-tight">
+      Interview <span className="text-primary">Sarthi</span>
+    </Link>
+  </div>
+
+  <button
+    className="lg:hidden text-muted-foreground hover:text-foreground"
+    onClick={() => setSidebarOpen(false)}
+  >
+    <X size={24} />
+  </button>
+</div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
           <nav className="space-y-2 pb-4">
@@ -115,20 +123,7 @@ export default function DashboardLayout() {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             
-            {/* Language Selector */}
-            <div className="hidden sm:flex items-center bg-muted/50 rounded-xl p-1 border border-border/50">
-              {['English', 'Hindi'].map(l => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                    lang === l ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {l === 'English' ? 'EN' : 'HI'}
-                </button>
-              ))}
-            </div>
+            <LanguageSelector />
 
             <Link to="/dashboard/notifications">
               <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors">
@@ -137,17 +132,16 @@ export default function DashboardLayout() {
               </button>
             </Link>
 
-            <div className="hidden sm:flex items-center gap-2">
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-xl bg-muted/50 hover:bg-muted transition-colors border border-border/50"
-              >
-                {theme === 'dark' ? <span className="text-xl leading-none">☀️</span> : <span className="text-xl leading-none">🌙</span>}
-              </button>
-            </div>
+            <button 
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors border border-border"
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
 
             {/* Profile in Navbar */}
-            <div className="flex items-center gap-3 pl-4 border-l border-border">
+            <Link to="/dashboard/profile" className="flex items-center gap-3 pl-4 border-l border-border hover:opacity-80 transition-opacity cursor-pointer">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shrink-0">
                 {user?.name?.charAt(0) || 'U'}
               </div>
@@ -155,7 +149,7 @@ export default function DashboardLayout() {
                 <p className="font-semibold text-sm leading-tight">{user?.name || 'User'}</p>
                 <p className="text-xs text-muted-foreground leading-tight">{user?.email}</p>
               </div>
-            </div>
+            </Link>
           </div>
         </header>
 

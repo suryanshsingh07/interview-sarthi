@@ -69,7 +69,6 @@ const getDashboardStats = async (req, res) => {
       const dateStr = date.toISOString().split('T')[0];
       const dayInterviews = await Interview.find({
         user: req.user._id,
-        status: 'completed',
         createdAt: {
           $gte: new Date(dateStr),
           $lt: new Date(new Date(dateStr).getTime() + 86400000)
@@ -143,21 +142,31 @@ const getAdminStats = async (req, res) => {
 // @route   GET /api/progress/leaderboard
 const getLeaderboard = async (req, res) => {
   try {
-    const progressList = await Progress.find({ completedInterviews: { $gt: 0 } })
-      .populate('user', 'name targetRole avatar')
-      .lean();
+    const users = await User.find({ isActive: true }).lean();
+    const progressList = await Progress.find({}).lean();
+    
+    const progressMap = progressList.reduce((acc, p) => {
+      acc[p.user.toString()] = p;
+      return acc;
+    }, {});
 
-    const leaderboard = progressList.map(p => {
-      const points = (p.averageScore * p.completedInterviews * 10) + (p.currentStreak * 100);
+    const leaderboard = users.map(user => {
+      const p = progressMap[user._id.toString()] || {};
+      const completedInterviews = p.completedInterviews || user.totalInterviews || 0;
+      const currentStreak = p.currentStreak || user.streak || 0;
+      const averageScore = p.averageScore || user.averageScore || 0;
+      
+      const points = (averageScore * completedInterviews * 10) + (currentStreak * 100);
+      
       return {
-        _id: p.user._id,
-        name: p.user.name,
-        targetRole: p.user.targetRole || 'Candidate',
-        avatar: p.user.avatar,
+        _id: user._id.toString(),
+        name: user.name,
+        targetRole: user.targetRole || 'Candidate',
+        avatar: user.avatar,
         score: points,
-        streak: p.currentStreak,
-        avgScore: p.averageScore,
-        interviews: p.completedInterviews
+        streak: currentStreak,
+        avgScore: averageScore,
+        interviews: completedInterviews
       };
     })
     .sort((a, b) => b.score - a.score)

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/vite.svg" alt="Interview Sarthi Logo" width="100"/>
+  <img src="frontend/public/vite.svg" alt="Interview Sarthi Logo" width="150"/>
   <h1>Interview Sarthi</h1>
   <p><strong>Your AI-Powered Career Coach for the Modern Tech Industry</strong></p>
   <p>
@@ -10,31 +10,14 @@
     <img src="https://img.shields.io/badge/Gemini_AI-2.0-blueviolet.svg?style=for-the-badge&logo=google" alt="Gemini AI" />
     <img src="https://img.shields.io/badge/TailwindCSS-3.4-38B2AC.svg?style=for-the-badge&logo=tailwind-css" alt="TailwindCSS" />
   </p>
+  <p>
+    <a href="https://interview-sarthi-one.vercel.app/" target="_blank">
+      <img src="https://img.shields.io/badge/Live_Demo-🚀-blue?style=for-the-badge&logo=vercel" alt="Live Demo" />
+    </a>
+  </p>
 </div>
 
 <hr />
-
-## 📖 Table of Contents
-
-1. [Introduction & Overview](#introduction--overview)
-2. [Key Features](#key-features)
-3. [System Architecture](#system-architecture)
-4. [Database Schema (ER Diagram)](#database-schema)
-5. [User Roles & Authorization Flow](#user-roles--authorization-flow)
-6. [Frontend Application Structure](#frontend-application-structure)
-7. [Backend Application Structure](#backend-application-structure)
-8. [API Documentation](#api-documentation)
-9. [AI Integration Details (Gemini)](#ai-integration-details-gemini)
-10. [Local Development Setup](#local-development-setup)
-11. [Environment Variables](#environment-variables)
-12. [Deployment Guide](#deployment-guide)
-13. [Styling & Theming System](#styling--theming-system)
-14. [Troubleshooting & FAQs](#troubleshooting--faqs)
-15. [Future Roadmap](#future-roadmap)
-16. [Contributing Guidelines](#contributing-guidelines)
-17. [License](#license)
-
----
 
 ## 🌟 Introduction & Overview
 
@@ -424,11 +407,24 @@ We welcome contributions! Please follow these steps:
 
 ---
 
+## 👥 Meet Team Tech Titans
+
+We are **Tech Titans**, a passionate team of developers who brought Interview Sarthi to life! Here is our team structure:
+
+| Team Member | Role | Responsibilities |
+|---|---|---|
+| **Suryansh Singh** *(Team Lead)* | Project Lead & QA | Managed project planning, coordinated the team, integrated modules, conducted testing, debugging, deployment, and ensured overall project quality. |
+| **Shivam Jaiswal** | Frontend Developer | Designed and developed the responsive UI, implemented React components, routing, dashboards, animations, and user experience. |
+| **Anushka Singh** | Backend Developer | Developed REST APIs, database models, authentication, AI integration, server logic, and backend architecture. |
+| **Diya Srivastava** | Documentation & Presentation | Prepared project documentation, PPT, reports, workflow diagrams, and coordinated project presentation materials. |
+
+---
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 <div align="center">
-  <i>Built with ❤️ for developers by developers.</i>
+  <i>Built by Team: Tech Titans</i>
 </div>

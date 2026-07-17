@@ -10,8 +10,9 @@ export default function Footer() {
       <div className="container mx-auto max-w-6xl">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           <div>
-            <div className="font-display font-bold text-lg mb-4 flex items-center gap-1">
-              Interview <span className="text-gradient">Sarthi</span>
+            <div className="font-display font-bold text-lg mb-4 flex items-center gap-2">
+              <img src="/favicon.ico" className="w-6 h-6 object-contain" />
+              <span>Interview <span className="text-gradient">Sarthi</span></span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Practice smarter. Interview better. Your AI-powered career coach for the modern tech industry.
