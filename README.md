@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/vite.svg" alt="Interview Sarthi Logo" width="150"/>
+  <img src="./frontend/public/favicon.ico" alt="Interview Sarthi Logo" width="150"/>
   <h1>Interview Sarthi</h1>
   <p><strong>Your AI-Powered Career Coach for the Modern Tech Industry</strong></p>
   <p>
